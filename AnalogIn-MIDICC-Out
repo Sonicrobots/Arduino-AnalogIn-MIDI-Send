@@ -1,8 +1,7 @@
 // Sketch for sending MIDI Data from 5 potis A0, A1, A2, A3, A4 as CC Values
 // Documentation of the MIDI library at http://arduinomidilib.fortyseveneffects.com/
 // MIDI CC Values go from 0 till 128
-// potetniometer from AnalogIn goes from 0 to 1023
- 
+
 #include <MIDI.h>
 #include <midi_Defs.h>
 #include <midi_Namespace.h>
@@ -24,7 +23,7 @@ int CurrentPotValue= 0;
 
 void setup()
 {
-   MIDI.begin(1);                     // Setup with channel 1
+   MIDI.begin(channel);                     // Setup with channel
 }
 
 void loop()
