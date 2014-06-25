@@ -1,0 +1,46 @@
+// Sketch for sending MIDI Data from 5 potis A0, A1, A2, A3, A4 as CC Values
+// Documentation of the MIDI library at http://arduinomidilib.fortyseveneffects.com/
+// MIDI CC Values go from 0 till 128
+// potetniometer from AnalogIn goes from 0 to 1023
+ 
+#include <MIDI.h>
+#include <midi_Defs.h>
+#include <midi_Namespace.h>
+#include <midi_Settings.h>
+
+// PLEASE EDIT THE NEXT VARIABLES ACCORDING TO YOUR SETUP 
+
+    int CC[5] = {14,15,16,17,18}; // insert the CC-Controllers HERE, e.g. {14,15,16,17,18} will map the potentiometers on analog in 1-5, to the CC Controllers 14,15,16,17,18
+    int channel = 1; // set the MIDI Chanel on which to sen HERE
+    int threshold = 10; // set a threshold here. Lower values (1-5) will result in more accurate controllers, but more noise and data beeing send, higher value (5-20) will result in more stable but more inaccurate controllers beeing send
+
+// STOP EDITING
+// Variable decleration
+
+int LastPotValue[5] = {0,0,0,0,0};// store all the old values of maximal 5 Potis in one array; is used for later calculation of the threshold to defeat noise from the poti
+int LastMappedValue[5] = {0,0,0,0,0};// store all the old values of maximal 5 Potis in one array; is used for later calculation of the threshold to defeat noise from the poti
+int MappedValue = 0;
+int CurrentPotValue= 0;
+
+void setup()
+{
+   MIDI.begin(1);                     // Setup with channel 1
+}
+
+void loop()
+{
+for (int i=0; i <= 5; i++) // itterate through all the 5 potentiometers on AnalogIn<0..5>
+
+  {
+    CurrentPotValue = analogRead(i);                         // read the actual value from the potentiometer on AnalogIn<i>
+    if(abs(CurrentPotValue - LastPotValue[1]) < threshold)   // check if the actual Analog-IN value is much diffrent from the last one -> if not, dont send  the CC value again
+        continue;                                            // ignore all code below and jump to the next i-itteration of the for loop
+    LastPotValue[i] = CurrentPotValue;
+    MappedValue = map(CurrentPotValue, 0, 1023, 0, 127);                       // Map the value to 0-127 because a MIDI-CC value can carry only 0 .. 127 
+    if(MappedValue == LastMappedValue[i])                                      // after the mapping the same value might appear, we dont want it to be send twice --> dont send  the CC value again
+        continue;                                                              // ignore all code below and jump to the next i-itteration of the for loop
+    LastMappedValue[i] = MappedValue;
+    MIDI.sendControlChange(CC[i], MappedValue,channel);  // Send a controller message (CC Controller from array above, the actual controller value, channel)
+  }
+
+}
