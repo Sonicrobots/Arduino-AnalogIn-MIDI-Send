@@ -32,7 +32,7 @@ for (int i=0; i <= 5; i++) // itterate through all the 5 potentiometers on Analo
 
   {
     CurrentPotValue = analogRead(i);                         // read the actual value from the potentiometer on AnalogIn<i>
-    if(abs(CurrentPotValue - LastPotValue[1]) < threshold)   // check if the actual Analog-IN value is much diffrent from the last one -> if not, dont send  the CC value again
+    if(abs(CurrentPotValue - LastPotValue[i]) < threshold)   // check if the actual Analog-IN value is much diffrent from the last one -> if not, dont send  the CC value again
         continue;                                            // ignore all code below and jump to the next i-itteration of the for loop
     LastPotValue[i] = CurrentPotValue;
     MappedValue = map(CurrentPotValue, 0, 1023, 0, 127);                       // Map the value to 0-127 because a MIDI-CC value can carry only 0 .. 127 
